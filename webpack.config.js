@@ -5,17 +5,18 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const devMode = process.env.NODE_ENV !== "production";
 
-module.exports = function(env) {
+module.exports = function (env) {
   const config = {
+    mode: "development",
     entry: {
       main: [
         "webpack-dev-server/client?http://0.0.0.0:3001",
         // bundle the client for webpack-dev-server
         // and connect to the provided endpoint
 
-        "./index.js"
+        "./index.js",
         // the entry point of our app
-      ]
+      ],
     },
     output: {
       filename: "[name].[hash].js",
@@ -24,7 +25,7 @@ module.exports = function(env) {
 
       path: resolve(__dirname, "./dist"),
 
-      publicPath: "/"
+      publicPath: "/",
       // necessary for HMR to know where to load the hot update chunks
     },
 
@@ -32,11 +33,13 @@ module.exports = function(env) {
     devtool: "source-map",
     watch: false,
     devServer: {
-      contentBase: resolve(__dirname, "./dist"),
-      // match the output path
+      static: {
+        directory: resolve(__dirname, "./dist"),
+        // match the output path
 
-      publicPath: "/"
-      // match the output `publicPath`
+        publicPath: "/",
+        // match the output `publicPath`
+      },
     },
 
     module: {
@@ -44,26 +47,21 @@ module.exports = function(env) {
         {
           test: /\.(sa|sc|c)ss$/,
           use: [
-            {
-              loader: MiniCssExtractPlugin.loader,
-              options: {
-                hmr: devMode
-              }
-            },
+            MiniCssExtractPlugin.loader,
             "css-loader",
             "postcss-loader",
-            "sass-loader"
-          ]
+            "sass-loader",
+          ],
         },
         {
           test: /\.(png|svg|jpg|jpeg|gif)$/,
-          use: ["file-loader"]
+          use: ["file-loader"],
         },
         {
           test: /\.html$/i,
-          loader: "html-loader"
-        }
-      ]
+          loader: "html-loader",
+        },
+      ],
     },
 
     plugins: [
@@ -73,23 +71,23 @@ module.exports = function(env) {
         filename: "index.html",
         inject: "body",
         minify: {
-          collapseWhitespace: true
-        }
+          collapseWhitespace: true,
+        },
       }),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
         filename: devMode ? "[name].css" : "[name].[hash].css",
-        chunkFilename: devMode ? "[id].css" : "[id].[hash].css"
+        chunkFilename: devMode ? "[id].css" : "[id].[hash].css",
       }),
       new webpack.ProvidePlugin({
         jQuery: "jquery",
         "window.jQuery": "jquery",
         Tether: "tether",
         "window.Tether": "tether",
-        Popper: ["popper.js", "default"]
-      })
-    ]
+        Popper: ["popper.js", "default"],
+      }),
+    ],
   };
 
   return config;
